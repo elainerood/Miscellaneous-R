@@ -1,2 +1,2 @@
-# Miscellaneous-R
-Random functions that aren't part of a larger project (yet?)
+# Miscellaneous R code
+Random functions/code that isn't (yet?) part of a larger project. Updated as I come up with things.
