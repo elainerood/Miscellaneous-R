@@ -1,3 +1,6 @@
+## Original version from late Dec 2018
+## Updated 6 Feb 2019
+
 library(tidyverse)
 
 contacts <- readLines("Contacts.vcf")
@@ -16,7 +19,7 @@ rm(list = c("contacts", "start_ind", "end_ind"))
 #'    eventually settle on making it a two-column df that can later be spread()
 #' 3) Realize that contact photo info has to be specifically dealt with somehow,
 #'    determine this can be done with a combination of drop_na() and filter()
-#' 4) Find the reason I have duplicate names for spread() to object to,
+#' 4) Determine the reason I have duplicate names that spread() is objecting to,
 #'    which ends up being (multiple) custom labels for information. Pull out a
 #'    bit of old code from another project to make the custom labels unique
 #' 5) Neaten up the field names a bit
@@ -79,7 +82,7 @@ address_clean <- function(x) {
                       y[4], ", ", y[5], " ", y[6],
                       ifelse(y[7] == "", "", paste0("; ", y[7]))
     )
-    # -1:2 bc first two are always(?) blank
+    # -1:2 because first two are always(?) blank
     # or maybe if there's apt # or something? think about that more
   }
 }
@@ -106,4 +109,5 @@ contacts_df2 <- bind_cols(
 
 rm(list = c("namesort", "workaddress", "homeaddress"))
 
-# All columns are still character and idk if that's how I want it to be or not, but otherwise everything looks ok. Can write_csv() now or once that's determined
+# All columns are still character - may want to change that later - but otherwise everything looks ok.
+# Can write_csv() now or once that's determined

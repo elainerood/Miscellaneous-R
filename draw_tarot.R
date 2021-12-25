@@ -1,9 +1,9 @@
-## Tarot version of draw_cards (3/23/19)
+## Tarot version of draw_cards (23 Mar 2019)
 
 library(dplyr)
 library(glue)
 
-# major_names = c("The Fool (0)", "The Magician (1)",
+# major_names <- c("The Fool (0)", "The Magician (1)",
 #                 "The High Priestess (2)", "The Empress (3)",
 #                 "The Emperor (4)", "The Hierophant (5)",
 #                 "The Lovers (6)", "The Chariot (7)",
@@ -26,7 +26,10 @@ library(glue)
 #                 "16 - The Tower",            "17 - The Star",
 #                 "18 - The Moon",             "19 - The Sun",
 #                 "20 - Judgement",            "21 - The World")
-# Alternately, make a df with two columns, one w/0:21 and the other w/the names, then just paste() them into the format I want, which would be so much easier except that I did this part already
+
+#' Alternately, make a df with two columns, one w/0:21 and the other w/the names,
+#' then just paste() them into the format I want, which would be so much easier
+#' except that I did this part already
 
 draw_tarot <- function(n = 1,
                        suits = c("Wands", "Swords", "Cups", "Coins"),
@@ -47,37 +50,42 @@ draw_tarot <- function(n = 1,
                        exclude = NA_character_
 ) {
   #' n = number of cards to draw
-  #' suits = names for the suits (vector of strings)
-  #' minor_names = minor arcana card designations (vector of strings)
-  #' major_names = major arcana card names (vector of strings)
-  #' replace = draw with/without replacement; default = without
-  #' limit = "major" or "minor" if you only want to draw from that arcana, otherwise default is NA to draw from both
-  #' exclude = certain major arcana cards to exclude, if any (vector of string/s that must match 1+ of the major arcana names)
-  #' ^May later generalize to any card, but that's not something I care about atm -- could do a setdiff() and filter() for that -> might need a new column with the glue() result there instead of external
-
+  #' suits = names for the suits (character vector)
+  #' minor_names = minor arcana card designations (character vector)
+  #' major_names = major arcana card names (character vector)
+  #' replace = draw with (TRUE) or without (FALSE) replacement
+  #' limit = "major" or "minor" if you want to draw only from that arcana
+  #'          Default is NA, which draws from both
+  #' exclude = list of certain major arcana cards to exclude, if any (character vector,  must match 1+ of the major arcana names)
+  #'           **LATER: May generalize to any card; could do a setdiff() and filter().
+  #'           Might need a new column with the glue() result there instead of external?
+  
+  # Implement limitations/exclusions
   limit <- ifelse(is.na(limit), limit,
                   match.arg(limit, c("major", "minor")))
   major_names <- setdiff(major_names, exclude)
-
+  
+  # Build deck
   n_deck <- length(suits) * length(minor_names) + length(major_names)
   deck <- tibble(Value = c(rep(minor_names, times = length(suits)),
                            major_names),
                  Suit = c(rep(suits, each = length(minor_names)),
                           rep(NA_character_, times = length(major_names)))
   )
-
+  
+  # Reduce deck, if needed
   if(!is.na(limit)) {
     if(limit == "major") {deck <- filter(deck, is.na(Suit))
     } else if(limit == "minor") {deck <- filter(deck, !is.na(Suit))}
   }
-
+  
+  # Draw cards
   draw_df <- slice(deck, sample(dim(deck)[1], n, replace = replace))
   result <- ifelse(is.na(draw_df$Suit),
                    glue("{draw_df$Value}"),
                    glue("{draw_df$Value} of {draw_df$Suit}")
   )
   draw <- glue("{result}")
-  # ^Better output format w/glue
   return(draw)
 }
 
